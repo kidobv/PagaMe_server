@@ -1,0 +1,24 @@
+{
+  "name": "pagame_server",
+  "version": "1.0.0",
+  "description": "PagaMe app server to handle CRUD services",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kidobv/PagaMe_server.git"
+  },
+  "author": "Kidany Berrios",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kidobv/PagaMe_server/issues"
+  },
+  "homepage": "https://github.com/kidobv/PagaMe_server#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.6.9"
+  }
+}
