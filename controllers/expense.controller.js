@@ -1,10 +1,5 @@
 const Expense = require('../models/expense.model');
 
-//Simple version, without validation or sanitation
-exports.test = function (req, res) {
-    res.send('Greetings from the Test controller!');
-};
-
 //Create POST method
 exports.create = function(req,res){
     let expense = new Expense(
@@ -26,7 +21,7 @@ exports.create = function(req,res){
     })
 };
 
-//Get
+//GET 
 exports.getExpenseById = function (req, res) {    
     Expense.findById(req.params.id, function (err, expense) {
         if (err) {
@@ -42,6 +37,7 @@ exports.getExpenseById = function (req, res) {
     })
 };
 
+//PUT
 exports.updateExpense = function(req,res){
     Expense.findByIdAndUpdate(req.params.id, { $set: req.body },
          function(err){
@@ -50,6 +46,7 @@ exports.updateExpense = function(req,res){
          });
 };
 
+//DELETE
 exports.deleteExpense = function (req, res) {
     Expense.findByIdAndDelete(req.params.id,
         function (err, doc) { // findByIdAndDelete passes the deleted document in the callback function we can use an argument like doc to access it
@@ -57,4 +54,20 @@ exports.deleteExpense = function (req, res) {
             if (doc) res.send(doc)
             else res.send("No record found")
         });
+};
+
+//Custom methods
+exports.getExpensesHistory = function (req, res) {    
+    Expense.find({ $or: [{ requestor: req.params.userEmail }, { requestee: req.params.userEmail }] }, 
+        function (err, docs) {
+        if (err) {
+            return next(err);
+        }
+        else if (docs) {
+            res.send(docs);
+        }
+        else {
+            res.send('No Expenses found');
+        } 
+    });
 };

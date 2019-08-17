@@ -16,3 +16,18 @@ exports.create = function (req, res) {
         res.send('User Created successfully')
     })
 };
+
+exports.getUserById = function (req, res) {
+    User.findById(req.params.id, function (err, user) {
+        if (err) {
+            return next(err);
+        }
+        else if (user) { // if user is not null
+            res.send(user);
+        }
+        else {
+            res.send('No Account has been found with the given credential');
+        }
+    })
+};
+
