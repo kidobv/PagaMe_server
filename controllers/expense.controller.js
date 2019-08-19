@@ -1,7 +1,7 @@
 const Expense = require('../models/expense.model');
 
 //Create POST method
-exports.create = function(req,res){
+exports.create = async function(req,res){
     let expense = new Expense(
         {
             description: req.body.description,
@@ -13,11 +13,11 @@ exports.create = function(req,res){
         }
     );
     //save method triggers the middleware, a callback function is optional but is a good place to capture any error and send a simple response
-    expense.save(function (err) {
+    await expense.save(function (err,doc) {
         if (err) {
-            return next(err);
+            res.send('Unable to create Expense')
         }
-        res.send('Expense Created successfully')
+        res.send(doc)
     })
 };
 
@@ -25,7 +25,9 @@ exports.create = function(req,res){
 exports.getExpenseById = function (req, res) {    
     Expense.findById(req.params.id, function (err, expense) {
         if (err) {
-            return next(err);
+            //handling error
+            res.send('No Expense found');
+            //return next(err);
         }
         else if(expense){
             res.send(expense);
@@ -41,7 +43,10 @@ exports.getExpenseById = function (req, res) {
 exports.updateExpense = function(req,res){
     Expense.findByIdAndUpdate(req.params.id, { $set: req.body },
          function(err){
-            if(err) return next(err);
+            if(err){
+                res.send("Unable to update Expense object")
+                //return next(err);
+            } 
              res.send('Expense updated successfully');
          });
 };
@@ -50,7 +55,7 @@ exports.updateExpense = function(req,res){
 exports.deleteExpense = function (req, res) {
     Expense.findByIdAndDelete(req.params.id,
         function (err, doc) { // findByIdAndDelete passes the deleted document in the callback function we can use an argument like doc to access it
-            if (err) return next(err);
+            if (err) res.send("Unable to delete record or record doesn't exist")//return next(err);
             if (doc) res.send(doc)
             else res.send("No record found")
         });
@@ -61,7 +66,7 @@ exports.getExpensesHistory = function (req, res) {
     Expense.find({ $or: [{ requestor: req.params.userEmail }, { requestee: req.params.userEmail }] }, 
         function (err, docs) {
         if (err) {
-            return next(err);
+            res.send('No Expenses found or bad formatting');//return next(err);
         }
         else if (docs) {
             res.send(docs);
