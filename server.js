@@ -1,9 +1,9 @@
-// config variables
-const config = require('./config.js');
+
 const express = require('express');
 const bodyParser = require('body-parser');
-// initialize our express app
-
+const path = require('path');
+// config variables
+const config = require('./config.js');
 //allows requests from different domain
 var cors = require('cors');
 const expenseRoute = require('./routes/expense.route'); // Imports routes for the expenses
@@ -30,48 +30,18 @@ app.use('/expenses', expenseRoute); //localhost:3030/expenses/...routres defined
 app.use('/users', userRoute);  //localhost:3030/users/...routres defined in userRoute
 
 
-//Error handling
-// catch 404 and forward to error handler
-app.use(function (err, res) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    res.json('error', {
-        message: err.message,
-        error: err
-    });
+const allowedExt = ['.js','.ico','.css','.png','.jpg','.woff2','.woff','.ttf','.svg'];
+
+app.get('*',(req,res) =>{
+    //resolve for files in the allowedExt array, if non of this extensions are part of the request then serve the index html
+    if(allowedExt.filter(ext => req.url.indexOf(ext)>0).length>0){
+        res.sendFile(path.resolve(`${__dirname}`,`./view/public/${req.url}`))
+    }else{
+        res.sendFile(path.resolve(`${__dirname}`, './view/public/index.html'))
+    }
 });
 
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-    app.use(function (err, res) {
-        res.status(err.status || 500);
-        res.json('error', {
-            message: err.message,
-            error: err
-        });
-    });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function (err, res) {
-    res.status(err.status || 500);
-    res.json('error', {
-        message: err.message,
-        error: {}
-    });
-});
-
-// //While in development
-// app.use(function (res, next) {
-//     res.setHeader('Access-Control-Allow-Origin', '*');
-//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
-//     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
-//     next();
-// });
-
-var server = app.listen(process.env.PORT || 3030, function () {
+var server = app.listen(process.env.PORT || 3000, function () {
     var host = server.address().address
     var port = server.address().port
 
