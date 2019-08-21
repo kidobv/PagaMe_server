@@ -1,5 +1,5 @@
 {
-  "name": "pagame_server",
+  "name": "pagame_mern",
   "version": "1.0.0",
   "description": "PagaMe app server to handle CRUD services",
   "main": "index.js",
