@@ -1,4 +1,6 @@
 const Expense = require('../models/expense.model');
+// session validation
+const session = require('../session.js');
 
 //Create POST method
 exports.create = async function(req,res){
@@ -40,16 +42,17 @@ exports.getExpenseById = function (req, res) {
 };
 
 //PUT
-exports.updateExpense = function(req,res){
-    Expense.findByIdAndUpdate(req.params.id, { $set: req.body },
-         function(err){
-            if(err){
-                res.send("Unable to update Expense object")
-                //return next(err);
-            } 
-             res.send('Expense updated successfully');
-         });
-};
+//Not being used yet
+// exports.updateExpense = function(req,res){
+//     Expense.findByIdAndUpdate(req.params.id, { $set: req.body },
+//          function(err){
+//             if(err){
+//                 res.send("Unable to update Expense object")
+//                 //return next(err);
+//             } 
+//              res.send('Expense updated successfully');
+//          });
+// };
 
 //DELETE
 exports.deleteExpense = function (req, res) {
@@ -58,21 +61,28 @@ exports.deleteExpense = function (req, res) {
             if (err) res.send("Unable to delete record or record doesn't exist")//return next(err);
             if (doc) res.send(doc)
             else res.send("No record found")
-        });
+        });  
 };
 
 //Custom methods
-exports.getExpensesHistory = function (req, res) {    
-    Expense.find({ $or: [{ requestor: req.params.userEmail }, { requestee: req.params.userEmail }] }, 
-        function (err, docs) {
-        if (err) {
-            res.send('No Expenses found or bad formatting');//return next(err);
+exports.getExpensesHistory = function (req, res) {   
+    //verify the request is for the authenticated user
+    if (req.params.userEmail !== session.AUTH_EMAIL) {
+       res.send("Unauthorized Operation!")
+        console.log("unathorized " + req.params.userEmail)
+        console.log("AUTH_EMAIL " + session.AUTH_EMAIL)
+    }else{
+        Expense.find({ $or: [{ requestor: req.params.userEmail }, { requestee: req.params.userEmail }] },
+            function (err, docs) {
+                if (err) {
+                    res.send('No Expenses found or bad formatting');//return next(err);
+                }
+                else if (docs) {
+                    res.send(docs);
+                }
+                else {
+                    res.send('No Expenses found');
+                }
+            });
         }
-        else if (docs) {
-            res.send(docs);
-        }
-        else {
-            res.send('No Expenses found');
-        } 
-    });
 };
